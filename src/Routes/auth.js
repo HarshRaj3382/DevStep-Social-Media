@@ -51,10 +51,13 @@ authrouter.post("/login", async (req, res) => {
       const token=await user.getJWT();
       
 
-      res.cookie("token",token,{
-        expires:new Date(Date.now()+8*360000),
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, // set to true in production with HTTPS
+        sameSite: "lax", // or 'none' with secure:true for cross-origin
+        expires: new Date(Date.now() + 8 * 360000),
       });
-      res.send("Login Successful!!!");
+      res.send(user);
     } else {
       throw new Error("Invalid Credentials");
     }
@@ -65,6 +68,17 @@ authrouter.post("/login", async (req, res) => {
   }
 });
 
+authrouter.post("/logout",async(req,res)=>{
+      try{
+        res.cookie("token",null,{
+            expires:new Date(Date.now()),
+        });
+        res.send("user loged out succesfully");
+      }catch(err){
+        res.send("ERROR :" + err.message);
+      }
+})
+
 
 // module.exports=authrouter
-export default authrouter;
+export default authrouter;   
